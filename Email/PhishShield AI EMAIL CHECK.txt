@@ -1,0 +1,22 @@
+PhishShield AI EMAIL CHECK
+
+Dear Customer,
+
+We detected unusual activity in your bank account from an unknown device located outside your region.
+
+To protect your account, we have temporarily restricted online banking access. You must verify your identity within the next 30 minutes to avoid permanent suspension.
+
+Please click the secure verification link below:
+
+http://secure-hdfc-verification-login-update.com/auth
+
+Failure to verify may result in:
+• Account suspension
+• Transaction blocking
+• Debit card deactivation
+
+For your security, do not share this email with anyone.
+
+Thank you,
+Security Verification Team
+HDFC Secure Banking Services

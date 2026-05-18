@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+pydantic
+pymongo
+scikit-learn
+joblib
+pandas
+requests
+python-multipart
+pyzbar
+opencv-python-headless
+numpy
+python-dotenv

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 300px;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #0f172a;
+      color: #e2e8f0;
+      margin: 0;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #3b82f6;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-weight: 600;
+      text-align: center;
+      text-transform: capitalize;
+    }
+    .safe { background-color: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .suspicious { background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .dangerous { background-color: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+    
+    .loading { text-align: center; color: #94a3b8; }
+    #details { font-size: 13px; color: #cbd5e1; }
+    .threat-item { margin-top: 4px; padding-left: 12px; border-left: 2px solid #ef4444; }
+  </style>
+</head>
+<body>
+  <h2>🛡️ PhishShield AI</h2>
+  <div id="content">
+    <div class="loading">Analyzing current page...</div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
