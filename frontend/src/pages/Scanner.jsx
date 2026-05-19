@@ -92,9 +92,9 @@ function Scanner() {
       </div>
       
       <div className="glass-segments p-1.5 mb-6 sm:mb-8 grid grid-cols-3 gap-1.5">
-        <TabButton active={activeTab === 'url'} onClick={() => { setActiveTab('url'); setResult(null); }} icon={<Link2 className="w-4 h-4 sm:w-4.5 sm:h-4.5"/>} text="URL" desktopText="URL Scanner" />
-        <TabButton active={activeTab === 'email'} onClick={() => { setActiveTab('email'); setResult(null); }} icon={<Mail className="w-4 h-4 sm:w-4.5 sm:h-4.5"/>} text="Email" desktopText="Email Analyzer" />
-        <TabButton active={activeTab === 'qr'} onClick={() => { setActiveTab('qr'); setResult(null); }} icon={<QrCode className="w-4 h-4 sm:w-4.5 sm:h-4.5"/>} text="QR" desktopText="QR Scanner" />
+        <TabButton active={activeTab === 'url'} onClick={() => { setActiveTab('url'); setResult(null); }} icon={<Link2 className="w-4 h-4 sm:w-5 sm:h-5"/>} text="URL" desktopText="URL Scanner" />
+        <TabButton active={activeTab === 'email'} onClick={() => { setActiveTab('email'); setResult(null); }} icon={<Mail className="w-4 h-4 sm:w-5 sm:h-5"/>} text="Email" desktopText="Email Analyzer" />
+        <TabButton active={activeTab === 'qr'} onClick={() => { setActiveTab('qr'); setResult(null); }} icon={<QrCode className="w-4 h-4 sm:w-5 sm:h-5"/>} text="QR" desktopText="QR Scanner" />
       </div>
 
       <div className="glass-panel p-6 sm:p-8 mb-6 sm:mb-8 shadow-[0_15px_30px_rgba(0,0,0,0.4)] relative overflow-hidden">

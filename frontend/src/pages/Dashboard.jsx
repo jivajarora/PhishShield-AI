@@ -31,9 +31,9 @@ function Dashboard() {
   };
 
   const getStatusIcon = (status) => {
-    if (status === 'safe') return <ShieldCheck className="w-4.5 h-4.5 text-emerald-400 filter drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]" />;
-    if (status === 'suspicious') return <AlertTriangle className="w-4.5 h-4.5 text-amber-400 filter drop-shadow-[0_0_4px_rgba(245,158,11,0.3)]" />;
-    if (status === 'dangerous') return <ShieldAlert className="w-4.5 h-4.5 text-red-500 filter drop-shadow-[0_0_4px_rgba(239,68,68,0.3)]" />;
+    if (status === 'safe') return <ShieldCheck className="w-5 h-5 text-emerald-400 filter drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]" />;
+    if (status === 'suspicious') return <AlertTriangle className="w-5 h-5 text-amber-400 filter drop-shadow-[0_0_4px_rgba(245,158,11,0.3)]" />;
+    if (status === 'dangerous') return <ShieldAlert className="w-5 h-5 text-red-500 filter drop-shadow-[0_0_4px_rgba(239,68,68,0.3)]" />;
   };
 
   return (
@@ -64,26 +64,26 @@ function Dashboard() {
               <table className="w-full text-left border-collapse">
                 <thead className="bg-white/[0.02] border-b border-white/[0.06] text-slate-400 select-none">
                   <tr>
-                    <th className="p-4.5 font-bold uppercase tracking-wider text-[10px]">Type</th>
-                    <th className="p-4.5 font-bold uppercase tracking-wider text-[10px]">Input / Target</th>
-                    <th className="p-4.5 font-bold uppercase tracking-wider text-[10px]">Status</th>
-                    <th className="p-4.5 font-bold uppercase tracking-wider text-[10px]">Risk Score</th>
-                    <th className="p-4.5 font-bold uppercase tracking-wider text-[10px]">Date</th>
+                    <th className="py-4 px-6 font-bold uppercase tracking-wider text-[10px]">Type</th>
+                    <th className="py-4 px-6 font-bold uppercase tracking-wider text-[10px]">Input / Target</th>
+                    <th className="py-4 px-6 font-bold uppercase tracking-wider text-[10px]">Status</th>
+                    <th className="py-4 px-6 font-bold uppercase tracking-wider text-[10px]">Risk Score</th>
+                    <th className="py-4 px-6 font-bold uppercase tracking-wider text-[10px]">Date</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/[0.04]">
                   {history.map((item, idx) => (
                     <tr key={idx} className="hover:bg-white/[0.015] transition-colors duration-200">
-                      <td className="p-4.5">
+                      <td className="py-4 px-6">
                         <div className="flex items-center gap-2 capitalize text-slate-400 font-semibold text-sm">
                           <span className="p-1.5 rounded-lg bg-white/[0.02] border border-white/[0.06]">{getIcon(item.type)}</span>
                           <span>{item.type}</span>
                         </div>
                       </td>
-                      <td className="p-4.5 max-w-xs truncate text-slate-200 font-medium text-sm" title={item.input}>
+                      <td className="py-4 px-6 max-w-xs truncate text-slate-200 font-medium text-sm" title={item.input}>
                         {item.input}
                       </td>
-                      <td className="p-4.5 capitalize">
+                      <td className="py-4 px-6 capitalize">
                         <div className="flex items-center gap-2 text-sm font-bold">
                           {getStatusIcon(item.status)}
                           <span className={item.status === 'safe' ? 'text-emerald-400' : item.status === 'suspicious' ? 'text-amber-400' : 'text-red-400'}>
@@ -91,7 +91,7 @@ function Dashboard() {
                           </span>
                         </div>
                       </td>
-                      <td className="p-4.5">
+                      <td className="py-4 px-6">
                         <div className="flex items-center gap-3">
                           <div className="w-full bg-white/[0.03] border border-white/[0.05] rounded-full h-2 max-w-[100px] overflow-hidden">
                             <div 
@@ -102,7 +102,7 @@ function Dashboard() {
                           <span className="text-xs text-slate-400 font-mono font-bold">{item.risk_score}</span>
                         </div>
                       </td>
-                      <td className="p-4.5 text-slate-400 text-xs font-medium">
+                      <td className="py-4 px-6 text-slate-400 text-xs font-medium">
                         {new Date(item.timestamp).toLocaleString()}
                       </td>
                     </tr>

@@ -11,3 +11,4 @@ pyzbar
 opencv-python-headless
 numpy
 python-dotenv
+pillow
