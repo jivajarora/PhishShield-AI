@@ -2,9 +2,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Zap, Lock, Scan } from 'lucide-react';
 
-function Home() {
+function Home({ user }) {
   return (
     <div className="flex flex-col items-center justify-center animate-fade-in text-center py-6 sm:py-12">
+      {user?.email === 'arorajivaj3009@gmail.com' && (
+        <div className="mb-8 bg-gradient-to-r from-red-500/10 via-rose-500/10 to-red-500/10 border border-red-500/20 px-6 py-2 rounded-full text-xs font-black tracking-widest text-red-400 uppercase select-none shadow-[0_4px_12px_rgba(0,0,0,0.3)] flex items-center gap-2">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+          </span>
+          Welcome, System Admin
+        </div>
+      )}
+
       {/* Icon Shield with Neon Glow Ring */}
       <div className="relative mb-8 sm:mb-10 group">
         <div className="absolute inset-0 bg-[#ef4444]/20 rounded-full blur-2xl group-hover:bg-[#ef4444]/35 transition-colors duration-500"></div>

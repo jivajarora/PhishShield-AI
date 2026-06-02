@@ -22,9 +22,10 @@ def save_scan_result(data: dict):
         print(f"Failed to save to MongoDB: {e}")
         return False
 
-def get_scan_history(limit=50):
+def get_scan_history(user_email: str = None, limit=50):
     try:
-        results = list(scan_history.find({}, {"_id": 0}).sort("timestamp", -1).limit(limit))
+        query = {"user_email": user_email} if user_email else {}
+        results = list(scan_history.find(query, {"_id": 0}).sort("timestamp", -1).limit(limit))
         return results
     except Exception as e:
         print(f"Failed to fetch history: {e}")

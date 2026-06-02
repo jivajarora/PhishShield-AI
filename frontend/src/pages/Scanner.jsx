@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Link2, Mail, QrCode, AlertTriangle, ShieldCheck, AlertCircle, Loader2, Scan, ScanLine } from 'lucide-react';
 
 const API_BASE = '/api';
 
-function Scanner() {
+function Scanner({ user, token }) {
   const [activeTab, setActiveTab] = useState('url');
   const [input, setInput] = useState('');
   const [file, setFile] = useState(null);
@@ -16,23 +16,32 @@ function Scanner() {
     setLoading(true);
     setResult(null);
 
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    };
+
     try {
       let res;
       if (activeTab === 'url') {
-        res = await axios.post(`${API_BASE}/scan-url`, { url: input });
+        res = await axios.post(`${API_BASE}/scan-url`, { url: input }, config);
       } else if (activeTab === 'email') {
-        res = await axios.post(`${API_BASE}/scan-email`, { content: input });
+        res = await axios.post(`${API_BASE}/scan-email`, { content: input }, config);
       } else if (activeTab === 'qr' && file) {
         const formData = new FormData();
         formData.append('file', file);
         res = await axios.post(`${API_BASE}/scan-qr`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
+          headers: { 
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
+          }
         });
       }
       setResult(activeTab === 'qr' ? res.data.scan_result : res.data);
     } catch (error) {
       console.error(error);
-      const errorMessage = error.response?.data?.detail || 'Error during scanning. Make sure the backend is running.';
+      const errorMessage = error.response?.data?.detail || 'Error during scanning. Make sure the backend is available and you are logged in.';
       alert(errorMessage);
     } finally {
       setLoading(false);
@@ -91,10 +100,16 @@ function Scanner() {
         <ThreatLevelBar result={result} />
       </div>
       
-      <div className="glass-segments p-1.5 mb-6 sm:mb-8 grid grid-cols-3 gap-1.5">
-        <TabButton active={activeTab === 'url'} onClick={() => { setActiveTab('url'); setResult(null); }} icon={<Link2 className="w-4 h-4 sm:w-5 sm:h-5"/>} text="URL" desktopText="URL Scanner" />
-        <TabButton active={activeTab === 'email'} onClick={() => { setActiveTab('email'); setResult(null); }} icon={<Mail className="w-4 h-4 sm:w-5 sm:h-5"/>} text="Email" desktopText="Email Analyzer" />
-        <TabButton active={activeTab === 'qr'} onClick={() => { setActiveTab('qr'); setResult(null); }} icon={<QrCode className="w-4 h-4 sm:w-5 sm:h-5"/>} text="QR" desktopText="QR Scanner" />
+      {/* Desktop Scanner Tab Bar */}
+      <div className="hidden sm:grid glass-segments p-1.5 mb-8 grid-cols-3 gap-1.5">
+        <TabButton active={activeTab === 'url'} onClick={() => { setActiveTab('url'); setResult(null); }} icon={<Link2 className="w-5 h-5"/>} text="URL" desktopText="URL Scanner" />
+        <TabButton active={activeTab === 'email'} onClick={() => { setActiveTab('email'); setResult(null); }} icon={<Mail className="w-5 h-5"/>} text="Email" desktopText="Email Analyzer" />
+        <TabButton active={activeTab === 'qr'} onClick={() => { setActiveTab('qr'); setResult(null); }} icon={<QrCode className="w-5 h-5"/>} text="QR" desktopText="QR Scanner" />
+      </div>
+
+      {/* Mobile Scanner Tab Bar (Gestural sliding mercury control) */}
+      <div className="block sm:hidden">
+        <MobileScannerTabBar activeTab={activeTab} setActiveTab={setActiveTab} setResult={setResult} />
       </div>
 
       <div className="glass-panel p-6 sm:p-8 mb-6 sm:mb-8 shadow-[0_15px_30px_rgba(0,0,0,0.4)] relative overflow-hidden">
@@ -227,6 +242,165 @@ function TabButton({ active, onClick, icon, text, desktopText }) {
     </button>
   );
 }
+
+function MobileScannerTabBar({ activeTab, setActiveTab, setResult }) {
+  const containerRef = useRef(null);
+  const tabs = ['url', 'email', 'qr'];
+  const activeIndex = tabs.indexOf(activeTab);
+
+  const [hoverIndex, setHoverIndex] = useState(activeIndex);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragX, setDragX] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [lastVibratedIndex, setLastVibratedIndex] = useState(activeIndex);
+
+  // Sync hoverIndex with activeTab change
+  useEffect(() => {
+    setHoverIndex(activeIndex);
+  }, [activeIndex]);
+
+  const handleTouchStart = (e) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    setContainerWidth(rect.width);
+    setIsDragging(true);
+
+    const clientX = e.touches[0].clientX;
+    const relX = Math.max(0, Math.min(rect.width, clientX - rect.left));
+    setDragX(relX);
+
+    const sectionWidth = rect.width / 3;
+    const touchedIdx = Math.min(2, Math.floor(relX / sectionWidth));
+    setHoverIndex(touchedIdx);
+    setLastVibratedIndex(touchedIdx);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const clientX = e.touches[0].clientX;
+    const relX = Math.max(0, Math.min(rect.width, clientX - rect.left));
+    setDragX(relX);
+
+    const sectionWidth = rect.width / 3;
+    const currentHoverIdx = Math.min(2, Math.floor(relX / sectionWidth));
+
+    if (currentHoverIdx !== hoverIndex) {
+      setHoverIndex(currentHoverIdx);
+      if (currentHoverIdx !== lastVibratedIndex) {
+        if (navigator.vibrate) {
+          navigator.vibrate(10);
+        }
+        setLastVibratedIndex(currentHoverIdx);
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+
+    const nextTab = tabs[hoverIndex];
+    if (nextTab !== activeTab) {
+      setActiveTab(nextTab);
+      setResult(null);
+    }
+  };
+
+  const handleTabClick = (idx) => {
+    const nextTab = tabs[idx];
+    if (nextTab !== activeTab) {
+      setActiveTab(nextTab);
+      setResult(null);
+    }
+  };
+
+  // Calculate droplet background style
+  let dropletStyle = {};
+  if (containerWidth > 0) {
+    if (isDragging) {
+      const percentage = (dragX / containerWidth) * 100;
+      const hoverCenterPercent = (hoverIndex * 2 + 1) * 16.666;
+      const dist = Math.abs(percentage - hoverCenterPercent);
+      const stretchX = 1 + Math.min(0.35, dist / 40);
+      const stretchY = 1 - Math.min(0.18, dist / 80);
+
+      dropletStyle = {
+        left: `${percentage}%`,
+        transform: `translate(-50%, -50%) scale(${stretchX}, ${stretchY})`,
+        transition: 'transform 0.05s ease-out',
+      };
+    } else {
+      const percentage = (activeIndex * 2 + 1) * 16.666;
+      dropletStyle = {
+        left: `${percentage}%`,
+        transform: 'translate(-50%, -50%) scale(1, 1)',
+        transition: 'left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+      };
+    }
+  } else {
+    const percentage = (activeIndex * 2 + 1) * 16.666;
+    dropletStyle = {
+      left: `${percentage}%`,
+      transform: 'translate(-50%, -50%)',
+    };
+  }
+
+  return (
+    <div 
+      ref={containerRef}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className="relative glass-segments p-1.5 mb-6 flex justify-between items-center select-none touch-none"
+    >
+      {/* Dynamic Mercury Glass Droplet Background */}
+      <div 
+        className="absolute top-1/2 w-[28%] h-[78%] rounded-full bg-gradient-to-r from-red-600/20 via-red-500/25 to-red-600/20 border border-red-500/25 shadow-[0_0_15px_rgba(239,68,68,0.25),inset_0_1px_1px_rgba(255,255,255,0.15)] pointer-events-none z-0"
+        style={dropletStyle}
+      />
+
+      {/* Buttons */}
+      {tabs.map((tab, idx) => {
+        const isSelected = isDragging ? hoverIndex === idx : activeIndex === idx;
+        let label = 'URL';
+        let icon = null;
+
+        if (tab === 'url') {
+          label = 'URL';
+          icon = <Link2 className="w-4 h-4" />;
+        } else if (tab === 'email') {
+          label = 'Email';
+          icon = <Mail className="w-4 h-4" />;
+        } else {
+          label = 'QR';
+          icon = <QrCode className="w-4 h-4" />;
+        }
+
+        return (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => handleTabClick(idx)}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 relative z-10 cursor-pointer outline-none focus:outline-none bg-transparent border-none"
+          >
+            <div 
+              className={`transition-all duration-300 ${isSelected ? 'text-red-500 scale-110 filter drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'text-slate-400'}`}
+            >
+              {icon}
+            </div>
+            <span 
+              className={`text-xs font-bold transition-all duration-300 ${isSelected ? 'text-white scale-102' : 'text-slate-500'}`}
+            >
+              {label}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 
 function ResultCard({ result }) {
   const isSafe = result.status === 'safe';

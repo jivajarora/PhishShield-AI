@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File, Depends
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 import json
 from services import threat_intel, qr_scanner
 from models import database
+from utils.auth import get_current_user
 
 router = APIRouter()
 
@@ -15,11 +16,12 @@ class EmailScanRequest(BaseModel):
     content: str
 
 @router.post("/scan-url")
-def scan_url(request: URLScanRequest):
+def scan_url(request: URLScanRequest, current_user: dict = Depends(get_current_user)):
     result = threat_intel.analyze_url(request.url)
     
-    # Save to MongoDB
+    # Save to MongoDB associated with the user
     record = {
+        "user_email": current_user["email"],
         "type": "url",
         "input": request.url,
         "timestamp": datetime.utcnow(),
@@ -32,12 +34,14 @@ def scan_url(request: URLScanRequest):
     return result
 
 @router.post("/scan-email")
-def scan_email(request: EmailScanRequest):
+def scan_email(request: EmailScanRequest, current_user: dict = Depends(get_current_user)):
     result = threat_intel.analyze_text(request.content)
     
+    # Save to MongoDB associated with the user
     record = {
+        "user_email": current_user["email"],
         "type": "email",
-        "input": request.content[:100] + "..." if len(request.content) > 100 else request.content,
+        "input": request.content,
         "timestamp": datetime.utcnow(),
         "status": result["status"],
         "risk_score": result["risk_score"],
@@ -48,7 +52,7 @@ def scan_email(request: EmailScanRequest):
     return result
 
 @router.post("/scan-qr")
-async def scan_qr(file: UploadFile = File(...)):
+async def scan_qr(file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
     contents = await file.read()
     decoded_url = qr_scanner.decode_qr(contents)
     
@@ -58,7 +62,9 @@ async def scan_qr(file: UploadFile = File(...)):
     # Scan the decoded URL
     result = threat_intel.analyze_url(decoded_url)
     
+    # Save to MongoDB associated with the user
     record = {
+        "user_email": current_user["email"],
         "type": "qr",
         "input": decoded_url,
         "timestamp": datetime.utcnow(),
@@ -70,7 +76,13 @@ async def scan_qr(file: UploadFile = File(...)):
     
     return {"decoded_url": decoded_url, "scan_result": result}
 
+ADMIN_EMAILS = {"arorajivaj3009@gmail.com"}
+
 @router.get("/history")
-def get_history():
-    history = database.get_scan_history()
+def get_history(current_user: dict = Depends(get_current_user)):
+    # If the user is an admin, fetch all histories; otherwise, filter by their email
+    if current_user["email"] in ADMIN_EMAILS:
+        history = database.get_scan_history(user_email=None)
+    else:
+        history = database.get_scan_history(user_email=current_user["email"])
     return {"history": history}

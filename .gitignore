@@ -51,7 +51,7 @@ MANIFEST
 *.sw?
 .DS_Store
 
-# Logs
+# Logs and Tunnels
 logs/
 *.log
 npm-debug.log*
@@ -59,3 +59,4 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+pinggy_url.txt

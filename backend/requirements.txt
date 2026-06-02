@@ -12,3 +12,4 @@ opencv-python-headless
 numpy
 python-dotenv
 pillow
+google-auth
