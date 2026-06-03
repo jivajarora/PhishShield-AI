@@ -18,7 +18,10 @@ app.add_middleware(
 )
 
 app.include_router(scan.router, prefix="/api")
+app.include_router(scan.router)
 
 @app.get("/")
+@app.get("/api")
 def read_root():
     return {"message": "Welcome to PhishShield AI API"}
+
