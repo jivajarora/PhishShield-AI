@@ -9,6 +9,12 @@
 </p>
 
 <p align="center">
+  <a href="https://phish-shield-ai-psi.vercel.app/" target="_blank">
+    <img src="https://img.shields.io/badge/Live_Demo-Vercel-success?style=for-the-badge&logo=vercel" alt="Live Demo"/>
+  </a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi" alt="FastAPI"/>
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React"/>
   <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind"/>
@@ -23,6 +29,14 @@
 **PhishShield AI** is a state-of-the-art cybersecurity platform engineered to identify and mitigate phishing threats across multiple vectors. By leveraging machine learning and advanced heuristic analysis, PhishShield provides users with real-time protection against malicious URLs, fraudulent emails, and suspicious QR codes.
 
 The project implements a "Red Alert" threat intelligence aesthetic, designed to provide high-visibility security alerts and a comprehensive dashboard for threat monitoring.
+
+## 🌐 Deployed Application
+
+The platform is live-hosted and deployed on Vercel:
+🔗 **[https://phish-shield-ai-psi.vercel.app](https://phish-shield-ai-psi.vercel.app)**
+
+> [!NOTE]
+> Google Sign-In authentication is active. To perform scans, authenticate with your Google account. Authorized admin accounts (e.g., `arorajivaj3009@gmail.com`) can view the global dashboard with full scan logs.
 
 ## 🚀 Key Features
 
