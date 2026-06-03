@@ -3,7 +3,10 @@ import re
 import joblib
 from urllib.parse import urlparse
 
-MODEL_PATH = os.path.join(os.path.dirname(__file__), '../../ai-model/phishing_model.pkl')
+# Try local folder first (for Vercel deployment bundling), fallback to root-relative path
+MODEL_PATH = os.path.join(os.path.dirname(__file__), 'phishing_model.pkl')
+if not os.path.exists(MODEL_PATH):
+    MODEL_PATH = os.path.join(os.path.dirname(__file__), '../../ai-model/phishing_model.pkl')
 
 # List of common URL shorteners (matching the training pipeline)
 SHORTENERS = {

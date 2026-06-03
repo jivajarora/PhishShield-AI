@@ -1,8 +1,15 @@
 import cv2
 import numpy as np
-from pyzbar.pyzbar import decode
 from PIL import Image
 import io
+
+try:
+    from pyzbar.pyzbar import decode
+    HAS_PYZBAR = True
+except ImportError:
+    decode = None
+    HAS_PYZBAR = False
+
 
 def decode_qr(image_bytes: bytes) -> str:
     try:
@@ -15,11 +22,16 @@ def decode_qr(image_bytes: bytes) -> str:
 
         def try_decode(image, method_name):
             print(f"Trying QR decode method: {method_name}")
-            # Try pyzbar
-            decoded = decode(image)
-            if decoded:
-                print(f"Success with {method_name} (pyzbar)")
-                return decoded[0].data.decode('utf-8')
+            # Try pyzbar if available
+            if HAS_PYZBAR and decode is not None:
+                try:
+                    decoded = decode(image)
+                    if decoded:
+                        print(f"Success with {method_name} (pyzbar)")
+                        return decoded[0].data.decode('utf-8')
+                except Exception as pyzbar_err:
+                    print(f"pyzbar decoding failed: {pyzbar_err}")
+            
             # Try OpenCV
             detector = cv2.QRCodeDetector()
             data, _, _ = detector.detectAndDecode(image)
