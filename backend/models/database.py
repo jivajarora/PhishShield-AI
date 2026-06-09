@@ -7,7 +7,7 @@ load_dotenv()
 # We can use a local MongoDB if Atlas URI is not provided.
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
 
-client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=2000)
+client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=2000, tz_aware=True)
 db = client["phishshield_db"]
 
 # Collections

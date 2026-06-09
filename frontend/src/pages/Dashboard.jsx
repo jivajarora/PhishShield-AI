@@ -5,6 +5,34 @@ import { History, Link2, Mail, QrCode, ExternalLink, ShieldAlert, ShieldCheck, A
 
 const API_BASE = '/api';
 
+const parseDate = (timestamp) => {
+  if (!timestamp) return null;
+  let dateStr = timestamp;
+  if (typeof dateStr === 'string') {
+    const tIndex = dateStr.indexOf('T');
+    if (tIndex !== -1) {
+      const timePart = dateStr.slice(tIndex);
+      if (!timePart.includes('Z') && !timePart.includes('+') && !timePart.includes('-')) {
+        dateStr = dateStr + 'Z';
+      }
+    }
+  }
+  const dateObj = new Date(dateStr);
+  return isNaN(dateObj.getTime()) ? null : dateObj;
+};
+
+const formatToIST = (timestamp) => {
+  const dateObj = parseDate(timestamp);
+  if (!dateObj) return 'N/A';
+  return dateObj.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }) + ' IST';
+};
+
+const formatDateToIST = (timestamp) => {
+  const dateObj = parseDate(timestamp);
+  if (!dateObj) return 'N/A';
+  return dateObj.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata' });
+};
+
 function Dashboard({ user, token }) {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -119,7 +147,7 @@ function Dashboard({ user, token }) {
                         </div>
                       </td>
                       <td className="py-4 px-6 text-slate-400 text-xs font-medium">
-                        {new Date(item.timestamp).toLocaleString()}
+                        {formatToIST(item.timestamp)}
                       </td>
                     </tr>
                   ))}
@@ -142,7 +170,7 @@ function Dashboard({ user, token }) {
                       )}
                     </div>
                     <div className="text-[10px] text-slate-500 font-medium">
-                      {new Date(item.timestamp).toLocaleDateString()}
+                      {formatDateToIST(item.timestamp)}
                     </div>
                   </div>
                   <div className="text-slate-200 font-semibold break-all text-sm leading-relaxed max-h-12 overflow-hidden truncate">
@@ -321,7 +349,7 @@ function ScanDetailsModal({ scan, onClose, getStatusIcon, getIcon }) {
           <div className="flex flex-col gap-0.5 sm:text-right">
             <span>Diagnostic Timestamp:</span>
             <span className="text-slate-400 font-bold">
-              {scan.timestamp ? new Date(scan.timestamp).toLocaleString() : 'N/A'}
+              {formatToIST(scan.timestamp)}
             </span>
           </div>
         </div>

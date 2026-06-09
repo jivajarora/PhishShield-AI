@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Depends
 from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 from services import threat_intel, qr_scanner
 from models import database
@@ -24,7 +24,7 @@ def scan_url(request: URLScanRequest, current_user: dict = Depends(get_current_u
         "user_email": current_user["email"],
         "type": "url",
         "input": request.url,
-        "timestamp": datetime.utcnow(),
+        "timestamp": datetime.now(timezone.utc),
         "status": result["status"],
         "risk_score": result["risk_score"],
         "threats_detected": result["threats_detected"]
@@ -42,7 +42,7 @@ def scan_email(request: EmailScanRequest, current_user: dict = Depends(get_curre
         "user_email": current_user["email"],
         "type": "email",
         "input": request.content,
-        "timestamp": datetime.utcnow(),
+        "timestamp": datetime.now(timezone.utc),
         "status": result["status"],
         "risk_score": result["risk_score"],
         "threats_detected": result["threats_detected"]
@@ -67,7 +67,7 @@ async def scan_qr(file: UploadFile = File(...), current_user: dict = Depends(get
         "user_email": current_user["email"],
         "type": "qr",
         "input": decoded_url,
-        "timestamp": datetime.utcnow(),
+        "timestamp": datetime.now(timezone.utc),
         "status": result["status"],
         "risk_score": result["risk_score"],
         "threats_detected": result["threats_detected"]
