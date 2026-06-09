@@ -372,7 +372,7 @@ function DisclaimerModal({ onAccept }) {
             Please be advised that all scan actions, email reports, QR inputs, and analysis target histories processed through this dashboard are recorded under your authenticated account.
           </p>
           <p className="text-slate-400 bg-black/45 border border-white/[0.04] p-3 rounded-xl text-[11px] leading-relaxed">
-            These logs are subject to active supervision and review by the platform administrator (<span className="text-amber-400 font-bold">arorajivaj3009@gmail.com</span>) for threat intelligence analysis.
+            These logs are subject to active supervision and review by the system administrator for threat intelligence analysis.
           </p>
           <p className="text-red-400/90 font-semibold text-center">
             Please refrain from uploading or scanning confidential credentials, personal keys, or private sensitive correspondence.
