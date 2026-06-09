@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Shield, ScanLine, History, Home as HomeIcon } from 'lucide-react';
+import { Shield, ScanLine, History, Home as HomeIcon, AlertTriangle } from 'lucide-react';
 import Home from './pages/Home';
 import Scanner from './pages/Scanner';
 import Dashboard from './pages/Dashboard';
@@ -341,6 +341,58 @@ function MobileTabBar() {
   );
 }
 
+function DisclaimerModal({ onAccept }) {
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+      {/* Blur background overlay */}
+      <div className="fixed inset-0 bg-[#020204]/85 backdrop-blur-lg z-0" />
+      
+      {/* Modal Card */}
+      <div className="relative z-10 glass-panel max-w-md w-full p-8 rounded-[24px] border border-amber-500/20 shadow-[0_20px_50px_rgba(0,0,0,0.65)] flex flex-col gap-6 text-center animate-fade-in">
+        
+        {/* Specular highlights on card */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-[1px] bg-gradient-to-r from-transparent via-amber-500/40 to-transparent"></div>
+
+        {/* Warning Icon */}
+        <div className="flex justify-center">
+          <div className="p-4 rounded-full bg-amber-950/20 border border-amber-500/25 text-amber-500 filter drop-shadow-[0_0_10px_rgba(245,158,11,0.2)] animate-pulse">
+            <AlertTriangle className="w-10 h-10" />
+          </div>
+        </div>
+
+        {/* Header */}
+        <div className="flex flex-col gap-1.5 select-none">
+          <h2 className="text-xl font-black text-white tracking-tight">ADMINISTRATIVE DISCLOSURE</h2>
+          <span className="text-[9px] font-extrabold uppercase tracking-widest text-amber-500">Security & Supervision Notice</span>
+        </div>
+
+        {/* Warning Content */}
+        <div className="text-slate-300 text-xs leading-relaxed space-y-3 font-medium select-none text-left">
+          <p>
+            Please be advised that all scan actions, email reports, QR inputs, and analysis target histories processed through this dashboard are recorded under your authenticated account.
+          </p>
+          <p className="text-slate-400 bg-black/45 border border-white/[0.04] p-3 rounded-xl text-[11px] leading-relaxed">
+            These logs are subject to active supervision and review by the platform administrator (<span className="text-amber-400 font-bold">arorajivaj3009@gmail.com</span>) for threat intelligence analysis.
+          </p>
+          <p className="text-red-400/90 font-semibold text-center">
+            Please refrain from uploading or scanning confidential credentials, personal keys, or private sensitive correspondence.
+          </p>
+        </div>
+
+        {/* Action Button */}
+        <div className="mt-2">
+          <button 
+            onClick={onAccept}
+            className="w-full py-3 px-6 text-xs font-black tracking-wider uppercase text-black bg-amber-500 hover:bg-amber-400 hover:scale-[1.02] active:scale-[0.98] border-none rounded-xl transition-all duration-200 cursor-pointer shadow-[0_4px_20px_rgba(245,158,11,0.3)]"
+          >
+            I Acknowledge & Consent
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('phishshield_user');
@@ -351,6 +403,21 @@ function App() {
     return localStorage.getItem('phishshield_token') || null;
   });
 
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
+
+  useEffect(() => {
+    if (user && user.email !== 'arorajivaj3009@gmail.com') {
+      const accepted = localStorage.getItem(`disclaimer_accepted_${user.email}`);
+      if (!accepted) {
+        setShowDisclaimer(true);
+      } else {
+        setShowDisclaimer(false);
+      }
+    } else {
+      setShowDisclaimer(false);
+    }
+  }, [user]);
+
   const handleLogin = (userInfo, tokenStr) => {
     setUser(userInfo);
     setToken(tokenStr);
@@ -359,10 +426,20 @@ function App() {
   };
 
   const handleLogout = () => {
+    if (user) {
+      localStorage.removeItem(`disclaimer_accepted_${user.email}`);
+    }
     setUser(null);
     setToken(null);
     localStorage.removeItem('phishshield_user');
     localStorage.removeItem('phishshield_token');
+  };
+
+  const handleAcceptDisclaimer = () => {
+    if (user) {
+      localStorage.setItem(`disclaimer_accepted_${user.email}`, 'true');
+    }
+    setShowDisclaimer(false);
   };
 
   return (
@@ -387,6 +464,7 @@ function App() {
                   <Route path="/dashboard" element={<Dashboard user={user} token={token} />} />
                 </Routes>
               </main>
+              {showDisclaimer && <DisclaimerModal onAccept={handleAcceptDisclaimer} />}
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center min-h-screen">
