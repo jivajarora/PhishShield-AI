@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Zap, Lock, Scan } from 'lucide-react';
+import GlowingLightningShield from '../components/GlowingLightningShield';
+
 
 function Home({ user }) {
   return (
@@ -19,7 +21,7 @@ function Home({ user }) {
       <div className="relative mb-8 sm:mb-10 group">
         <div className="absolute inset-0 bg-[#ef4444]/20 rounded-full blur-2xl group-hover:bg-[#ef4444]/35 transition-colors duration-500"></div>
         <div className="relative z-10 p-6 sm:p-8 rounded-full bg-white/[0.02] border border-white/[0.08] backdrop-blur-md shadow-[0_15px_35px_rgba(239,68,68,0.15)] transition-transform duration-500 group-hover:scale-105">
-          <ShieldCheck className="w-20 h-20 sm:w-28 sm:h-28 text-[#ef4444] filter drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]" />
+          <GlowingLightningShield className="w-20 h-20 sm:w-28 sm:h-28" showGlow={true} />
         </div>
       </div>
       

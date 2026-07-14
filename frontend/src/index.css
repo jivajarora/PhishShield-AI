@@ -224,5 +224,34 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* Tracing animation for GlowingLightningShield */
+@keyframes shieldTrace {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-shield-trace {
+  animation: shieldTrace 4s linear infinite;
+}
+
+@keyframes bounceSlow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2.5px);
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounceSlow 3s ease-in-out infinite;
+  transform-origin: center;
+}
+
+
 
 

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Shield, ScanLine, History, Home as HomeIcon, AlertTriangle } from 'lucide-react';
 import Home from './pages/Home';
+import GlowingLightningShield from './components/GlowingLightningShield';
+
 import Scanner from './pages/Scanner';
 import Dashboard from './pages/Dashboard';
 
@@ -56,9 +58,7 @@ function Login({ onLogin }) {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-44 h-[1px] bg-gradient-to-r from-transparent via-red-500/40 to-transparent"></div>
         
         <div className="flex justify-center mb-6">
-          <div className="p-4 rounded-full bg-red-950/25 border border-red-500/25 text-[#ef4444] animate-pulse">
-            <Shield className="w-10 h-10" />
-          </div>
+          <GlowingLightningShield className="w-16 h-16" showGlow={true} />
         </div>
 
         <h2 className="text-xl font-black text-white tracking-tight mb-2">ACCESS DECRYPTION PROTOCOL</h2>
@@ -88,7 +88,7 @@ function Navbar({ user, onLogout }) {
       <div className="hidden md:block sticky top-0 z-50 px-4 pt-4">
         <nav className="flex bg-[#0b0b0f]/45 backdrop-blur-xl border border-white/[0.08] rounded-2xl px-6 py-3 justify-between items-center max-w-6xl mx-auto shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
           <Link to="/" className="flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer">
-            <Shield className="text-[#ef4444] w-7 h-7" />
+            <GlowingLightningShield className="w-7 h-7" showGlow={false} />
             <span className="text-xl font-bold text-white select-none tracking-tight">
               PhishShield <span className="text-red-500">AI</span>
             </span>
@@ -133,7 +133,7 @@ function Navbar({ user, onLogout }) {
       {/* Mobile Top Header - Frosted glass header */}
       <nav className="flex md:hidden bg-[#060608]/65 backdrop-blur-xl border-b border-white/[0.06] px-4 py-3 justify-between items-center sticky top-0 z-50">
         <Link to="/" className="flex items-center gap-2 hover:opacity-85 transition-opacity cursor-pointer">
-          <Shield className="text-[#ef4444] w-5.5 h-5.5" />
+          <GlowingLightningShield className="w-5.5 h-5.5" showGlow={false} />
           <span className="text-base font-bold text-white select-none tracking-tight">
             PhishShield <span className="text-red-500">AI</span>
           </span>
