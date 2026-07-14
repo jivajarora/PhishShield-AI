@@ -1,6 +1,14 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 export default function GlowingLightningShield({ className = "w-24 h-24", showGlow = true }) {
+  // Generate a unique suffix for this component instance's SVG IDs to prevent conflicts in the DOM
+  const uniqueId = useId().replace(/:/g, ''); // Remove colons to make it a valid SVG ID token
+  const redGlowId = `red-glow-${uniqueId}`;
+  const cyanGlowId = `cyan-glow-${uniqueId}`;
+  const shieldRedGradId = `shield-red-grad-${uniqueId}`;
+  const boltCyanGradId = `bolt-cyan-grad-${uniqueId}`;
+  const traceCyanGradId = `trace-cyan-grad-${uniqueId}`;
+
   return (
     <div className={`relative ${className} shrink-0 flex items-center justify-center`}>
       {/* Background Glow Mesh (Red for shield outer glow, Cyan for bolt inner glow) */}
@@ -21,7 +29,7 @@ export default function GlowingLightningShield({ className = "w-24 h-24", showGl
       >
         <defs>
           {/* Neon Glow Filters */}
-          <filter id="red-glow" x="-20%" y="-20%" width="140%" height="140%">
+          <filter id={redGlowId} x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="2.5" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
@@ -29,7 +37,7 @@ export default function GlowingLightningShield({ className = "w-24 h-24", showGl
             </feMerge>
           </filter>
 
-          <filter id="cyan-glow" x="-20%" y="-20%" width="140%" height="140%">
+          <filter id={cyanGlowId} x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="3" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
@@ -38,20 +46,20 @@ export default function GlowingLightningShield({ className = "w-24 h-24", showGl
           </filter>
 
           {/* Shield Red Gradient */}
-          <linearGradient id="shield-red-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id={shieldRedGradId} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#f43f5e" />
             <stop offset="100%" stopColor="#ef4444" />
           </linearGradient>
 
           {/* Bolt Cyan-Blue Gradient */}
-          <linearGradient id="bolt-cyan-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id={boltCyanGradId} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#06b6d4" />
             <stop offset="50%" stopColor="#0891b2" />
             <stop offset="100%" stopColor="#3b82f6" />
           </linearGradient>
 
           {/* Lightning Bolt Trace Gradient (White to Cyan) */}
-          <linearGradient id="trace-cyan-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id={traceCyanGradId} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#ffffff" />
             <stop offset="50%" stopColor="#67e8f9" />
             <stop offset="100%" stopColor="#06b6d4" />
@@ -61,20 +69,20 @@ export default function GlowingLightningShield({ className = "w-24 h-24", showGl
         {/* 1. Base Static Shield Path (glowing red outline) */}
         <path
           d="M50 12 C58 12 77 15 82 24 C82 45 74 68 50 86 C26 68 18 45 18 24 C23 15 42 12 50 12 Z"
-          stroke="url(#shield-red-grad)"
+          stroke={`url(#${shieldRedGradId})`}
           strokeWidth="3.5"
           strokeOpacity="0.8"
           strokeLinecap="round"
           strokeLinejoin="round"
-          filter="url(#red-glow)"
+          filter={`url(#${redGlowId})`}
         />
 
         {/* 2. Lightning Bolt Group (floating animation) */}
-        <g className="animate-bounce-slow" style={{ transformOrigin: 'center' }}>
+        <g className="animate-bounce-slow">
           {/* Static Cyan Lightning Bolt Background */}
           <path
             d="M55 24 L35 50 H48 L43 76 L65 44 H52 Z"
-            stroke="url(#bolt-cyan-grad)"
+            stroke={`url(#${boltCyanGradId})`}
             strokeWidth="3.5"
             strokeOpacity="0.4"
             strokeLinejoin="round"
@@ -84,12 +92,12 @@ export default function GlowingLightningShield({ className = "w-24 h-24", showGl
           {/* Animated Tracing Lightning Bolt Outline */}
           <path
             d="M55 24 L35 50 H48 L43 76 L65 44 H52 Z"
-            stroke="url(#trace-cyan-grad)"
+            stroke={`url(#${traceCyanGradId})`}
             strokeWidth="3.5"
             strokeLinejoin="round"
             strokeLinecap="round"
             className="animate-bolt-trace"
-            filter="url(#cyan-glow)"
+            filter={`url(#${cyanGlowId})`}
             style={{
               strokeDasharray: "40 110", // Dash of 40, gap of 110 (total ~150 length)
             }}
