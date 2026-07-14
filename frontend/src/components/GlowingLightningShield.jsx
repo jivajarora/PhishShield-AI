@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function GlowingLightningShield({ className = "w-24 h-24", showGlow = true }) {
   return (
-    <div className={`relative ${className} group flex items-center justify-center`}>
+    <div className={`relative ${className} shrink-0 flex items-center justify-center`}>
       {/* Background Glow Mesh */}
       {showGlow && (
         <div className="absolute inset-0 bg-[#ef4444]/15 rounded-full blur-2xl group-hover:bg-[#ef4444]/30 transition-colors duration-500"></div>
@@ -40,41 +40,42 @@ export default function GlowingLightningShield({ className = "w-24 h-24", showGl
           </linearGradient>
         </defs>
 
-        {/* 1. Base Static Dark Shield Path */}
+        {/* 1. Base Static Shield Path (subtle protective outline) */}
         <path
           d="M50 12 C58 12 77 15 82 24 C82 45 74 68 50 86 C26 68 18 45 18 24 C23 15 42 12 50 12 Z"
-          stroke="rgba(239, 68, 68, 0.2)"
-          strokeWidth="4.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-
-        {/* 2. Highlight Tracing Outline (Animated) */}
-        <path
-          d="M50 12 C58 12 77 15 82 24 C82 45 74 68 50 86 C26 68 18 45 18 24 C23 15 42 12 50 12 Z"
-          stroke="url(#shield-grad)"
-          strokeWidth="4.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          pathLength="100"
-          className="animate-shield-trace"
-          filter="url(#neon-glow)"
-          style={{
-            strokeDasharray: "25 75", // Dash of 25% length, gap of 75%
-          }}
-        />
-
-        {/* 3. Center Lightning Bolt (Sleek, matching Zap icon) */}
-        <path
-          d="M55 24 L35 50 H48 L43 76 L65 44 H52 Z"
-          fill="url(#zap-grad)"
           stroke="#ef4444"
-          strokeWidth="2"
-          strokeLinejoin="round"
+          strokeWidth="3.5"
+          strokeOpacity="0.45"
           strokeLinecap="round"
-          filter="url(#neon-glow)"
-          className="animate-bounce-slow"
+          strokeLinejoin="round"
         />
+
+        {/* 2. Lightning Bolt Group (floating animation) */}
+        <g className="animate-bounce-slow" style={{ transformOrigin: 'center' }}>
+          {/* Base lightning stroke for backdrop */}
+          <path
+            d="M55 24 L35 50 H48 L43 76 L65 44 H52 Z"
+            stroke="rgba(239, 68, 68, 0.25)"
+            strokeWidth="3"
+            strokeLinejoin="round"
+            strokeLinecap="round"
+          />
+
+          {/* Animated Tracing Lightning Bolt Outline */}
+          <path
+            d="M55 24 L35 50 H48 L43 76 L65 44 H52 Z"
+            stroke="url(#shield-grad)"
+            strokeWidth="3"
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            pathLength="100"
+            className="animate-bolt-trace"
+            filter="url(#neon-glow)"
+            style={{
+              strokeDasharray: "25 75", // Traveling light outline effect
+            }}
+          />
+        </g>
       </svg>
     </div>
   );

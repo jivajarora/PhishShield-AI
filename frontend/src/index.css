@@ -238,6 +238,10 @@
   animation: shieldTrace 4s linear infinite;
 }
 
+.animate-bolt-trace {
+  animation: shieldTrace 3.5s linear infinite;
+}
+
 @keyframes bounceSlow {
   0%, 100% {
     transform: translateY(0);

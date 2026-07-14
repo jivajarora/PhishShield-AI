@@ -133,7 +133,7 @@ function Navbar({ user, onLogout }) {
       {/* Mobile Top Header - Frosted glass header */}
       <nav className="flex md:hidden bg-[#060608]/65 backdrop-blur-xl border-b border-white/[0.06] px-4 py-3 justify-between items-center sticky top-0 z-50">
         <Link to="/" className="flex items-center gap-2 hover:opacity-85 transition-opacity cursor-pointer">
-          <GlowingLightningShield className="w-5.5 h-5.5" showGlow={false} />
+          <GlowingLightningShield className="w-6 h-6" showGlow={false} />
           <span className="text-base font-bold text-white select-none tracking-tight">
             PhishShield <span className="text-red-500">AI</span>
           </span>
