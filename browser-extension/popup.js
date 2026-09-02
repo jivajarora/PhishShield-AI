@@ -20,7 +20,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       body: JSON.stringify({ url: url })
     });
 
-    if (!response.ok) throw new Error('Backend error');
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.detail || 'Backend error');
+    }
 
     const data = await response.json();
     
@@ -38,6 +41,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     contentDiv.innerHTML = html;
   } catch (error) {
-    contentDiv.innerHTML = '<div style="color: #ef4444; font-size: 14px;">Error connecting to PhishShield API. Is the backend running?</div>';
+    contentDiv.innerHTML = `<div style="color: #ef4444; font-size: 14px;">${error.message || 'Error connecting to PhishShield API. Is the backend running?'}</div>`;
   }
 });

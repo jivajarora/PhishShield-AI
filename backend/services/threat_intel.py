@@ -1,7 +1,12 @@
 import os
 import re
+import socket
+import urllib3
+import requests
 import joblib
 from urllib.parse import urlparse
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # Try local folder first (for Vercel deployment bundling), fallback to root-relative path
 MODEL_PATH = os.path.join(os.path.dirname(__file__), 'phishing_model.pkl')
@@ -117,6 +122,83 @@ def check_trusted_domain(url: str) -> bool:
             return True
             
     return False
+
+def check_url_exists(raw_url: str) -> tuple:
+    """
+    Verifies whether a given URL actually exists on the internet before scanning.
+    Returns:
+        (exists: bool, reason: str)
+    """
+    url = (raw_url or "").strip()
+    if not url:
+        return False, "The entered URL does not exist."
+
+    has_scheme = url.startswith(("http://", "https://"))
+    test_url = url if has_scheme else "http://" + url
+
+    try:
+        parsed = urlparse(test_url)
+        hostname = parsed.hostname
+    except Exception:
+        return False, "The entered URL does not exist."
+
+    if not hostname:
+        return False, "The entered URL does not exist."
+
+    is_ip = bool(re.match(r'^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$', hostname))
+    if not is_ip and hostname != "localhost" and "." not in hostname:
+        return False, "The entered URL does not exist."
+
+    if hostname.startswith(".") or hostname.endswith(".") or ".." in hostname:
+        return False, "The entered URL does not exist."
+
+    # 1. DNS Resolution (fast check to eliminate non-existent domains)
+    try:
+        socket.getaddrinfo(hostname, None)
+    except (socket.gaierror, socket.herror, UnicodeError):
+        return False, "The entered URL does not exist."
+    except Exception:
+        return False, "The entered URL does not exist."
+
+    # 2. HTTP / HTTPS reachability check
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+
+    if has_scheme:
+        schemes = [url]
+        alt = ("http://" if url.startswith("https://") else "https://") + url.split("://", 1)[1]
+        schemes.append(alt)
+    else:
+        schemes = ["https://" + url, "http://" + url]
+
+    for target in schemes:
+        try:
+            requests.head(target, headers=headers, timeout=3.5, allow_redirects=True, verify=False)
+            return True, "URL exists and is reachable."
+        except requests.exceptions.SSLError:
+            # Server exists and is listening even if SSL certificate is invalid
+            return True, "URL exists and is reachable."
+        except requests.RequestException:
+            try:
+                requests.get(target, headers=headers, timeout=3.5, stream=True, verify=False)
+                return True, "URL exists and is reachable."
+            except requests.exceptions.SSLError:
+                return True, "URL exists and is reachable."
+            except requests.RequestException:
+                pass
+
+    # 3. Fallback: Direct TCP socket connection on web ports (80, 443)
+    target_port = parsed.port
+    ports = [target_port] if target_port else [443, 80]
+    for p in ports:
+        try:
+            with socket.create_connection((hostname, p), timeout=2.0):
+                return True, "URL exists and is reachable."
+        except Exception:
+            pass
+
+    return False, "The entered URL does not exist."
 
 def analyze_url(url: str) -> dict:
     # 1. Bypass trusted domains to eliminate false positives on safe platforms

@@ -9,12 +9,29 @@ import Dashboard from './pages/Dashboard';
 
 function Login({ onLogin }) {
   const googleBtnRef = useRef(null);
+  const [googleLoaded, setGoogleLoaded] = useState(!!window.google);
+
+  useEffect(() => {
+    if (window.google) {
+      setGoogleLoaded(true);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      if (window.google) {
+        setGoogleLoaded(true);
+        clearInterval(interval);
+      }
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     // Read Google Client ID from Vite env variables
     const client_id = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
     
-    if (client_id && window.google) {
+    if (client_id && googleLoaded && window.google) {
       try {
         window.google.accounts.id.initialize({
           client_id: client_id,
@@ -48,7 +65,7 @@ function Login({ onLogin }) {
         console.error("Google script initialization failed", err);
       }
     }
-  }, [onLogin]);
+  }, [onLogin, googleLoaded]);
 
   return (
     <div className="min-h-[75vh] flex flex-col items-center justify-center px-4 select-none relative z-10">
@@ -70,7 +87,7 @@ function Login({ onLogin }) {
           {/* Google Sign In Wrapper */}
           <div ref={googleBtnRef} className="w-full flex justify-center min-h-[44px]"></div>
           
-          {!window.google && (
+          {!googleLoaded && (
             <p className="text-[10px] text-slate-500 font-semibold animate-pulse">
               Establishing connection to Google Sign-In...
             </p>

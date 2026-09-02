@@ -17,6 +17,11 @@ class EmailScanRequest(BaseModel):
 
 @router.post("/scan-url")
 def scan_url(request: URLScanRequest, current_user: dict = Depends(get_current_user)):
+    # Verify the URL actually exists on the web before running AI scanning
+    url_exists, _ = threat_intel.check_url_exists(request.url)
+    if not url_exists:
+        raise HTTPException(status_code=400, detail="The entered URL does not exist.")
+
     result = threat_intel.analyze_url(request.url)
     
     # Save to MongoDB associated with the user
@@ -59,6 +64,12 @@ async def scan_qr(file: UploadFile = File(...), current_user: dict = Depends(get
     if not decoded_url:
         raise HTTPException(status_code=400, detail="Could not decode QR code.")
     
+    # Verify existence if the decoded QR code contains a URL
+    if decoded_url.startswith(("http://", "https://")) or "." in decoded_url:
+        url_exists, _ = threat_intel.check_url_exists(decoded_url)
+        if not url_exists:
+            raise HTTPException(status_code=400, detail="The entered URL does not exist.")
+
     # Scan the decoded URL
     result = threat_intel.analyze_url(decoded_url)
     

@@ -10,11 +10,13 @@ function Scanner({ user, token }) {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   const handleScan = async (e) => {
     e.preventDefault();
     setLoading(true);
     setResult(null);
+    setErrorMsg(null);
 
     const config = {
       headers: {
@@ -42,7 +44,7 @@ function Scanner({ user, token }) {
     } catch (error) {
       console.error(error);
       const errorMessage = error.response?.data?.detail || 'Error during scanning. Make sure the backend is available and you are logged in.';
-      alert(errorMessage);
+      setErrorMsg(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -97,20 +99,35 @@ function Scanner({ user, token }) {
       <h1 className="text-3xl sm:text-4xl font-extrabold mb-6 sm:mb-8 text-center text-white select-none tracking-tight">Threat Scanner</h1>
       
       <div className="mb-6 sm:mb-8">
-        <ThreatLevelBar result={result} />
+        <ThreatLevelBar result={result} errorMsg={errorMsg} />
       </div>
       
       {/* Desktop Scanner Tab Bar */}
       <div className="hidden sm:grid glass-segments p-1.5 mb-8 grid-cols-3 gap-1.5">
-        <TabButton active={activeTab === 'url'} onClick={() => { setActiveTab('url'); setResult(null); }} icon={<Link2 className="w-5 h-5"/>} text="URL" desktopText="URL Scanner" />
-        <TabButton active={activeTab === 'email'} onClick={() => { setActiveTab('email'); setResult(null); }} icon={<Mail className="w-5 h-5"/>} text="Email" desktopText="Email Analyzer" />
-        <TabButton active={activeTab === 'qr'} onClick={() => { setActiveTab('qr'); setResult(null); }} icon={<QrCode className="w-5 h-5"/>} text="QR" desktopText="QR Scanner" />
+        <TabButton active={activeTab === 'url'} onClick={() => { setActiveTab('url'); setResult(null); setErrorMsg(null); }} icon={<Link2 className="w-5 h-5"/>} text="URL" desktopText="URL Scanner" />
+        <TabButton active={activeTab === 'email'} onClick={() => { setActiveTab('email'); setResult(null); setErrorMsg(null); }} icon={<Mail className="w-5 h-5"/>} text="Email" desktopText="Email Analyzer" />
+        <TabButton active={activeTab === 'qr'} onClick={() => { setActiveTab('qr'); setResult(null); setErrorMsg(null); }} icon={<QrCode className="w-5 h-5"/>} text="QR" desktopText="QR Scanner" />
       </div>
 
       {/* Mobile Scanner Tab Bar (Gestural sliding mercury control) */}
       <div className="block sm:hidden">
-        <MobileScannerTabBar activeTab={activeTab} setActiveTab={setActiveTab} setResult={setResult} />
+        <MobileScannerTabBar activeTab={activeTab} setActiveTab={setActiveTab} setResult={setResult} setErrorMsg={setErrorMsg} />
       </div>
+
+      {/* Prominent Error Notification Card */}
+      {errorMsg && (
+        <div className="mb-6 sm:mb-8 p-5 sm:p-6 rounded-2xl bg-red-950/25 border border-red-500/30 flex items-start gap-4 text-red-400 shadow-[0_10px_30px_rgba(239,68,68,0.15)] animate-fade-in backdrop-blur-md">
+          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 shrink-0 mt-0.5">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <div className="flex flex-col text-left">
+            <span className="text-base sm:text-lg font-black text-white tracking-tight">{errorMsg}</span>
+            <span className="text-xs sm:text-sm text-slate-400 mt-1 leading-relaxed">
+              PhishShield AI only scans active, legitimate web destinations. Please verify the web address syntax and ensure the domain is active on the internet.
+            </span>
+          </div>
+        </div>
+      )}
 
       <div className="glass-panel p-6 sm:p-8 mb-6 sm:mb-8 shadow-[0_15px_30px_rgba(0,0,0,0.4)] relative overflow-hidden">
         {/* Subtle light leak for iOS design */}
@@ -121,11 +138,11 @@ function Scanner({ user, token }) {
             <div>
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">Suspicious URL</label>
               <input 
-                type="url" 
+                type="text" 
                 required 
                 value={input} 
-                onChange={e => setInput(e.target.value)}
-                placeholder="https://example.com/login" 
+                onChange={e => { setInput(e.target.value); setErrorMsg(null); }}
+                placeholder="https://example.com/login or example.com" 
                 className="w-full glass-input px-4 py-3.5 focus:outline-none text-white text-sm sm:text-base placeholder-slate-600"
               />
             </div>
@@ -138,7 +155,7 @@ function Scanner({ user, token }) {
                 required 
                 rows={6}
                 value={input} 
-                onChange={e => setInput(e.target.value)}
+                onChange={e => { setInput(e.target.value); setErrorMsg(null); }}
                 placeholder="Paste the suspicious message here..." 
                 className="w-full glass-input px-4 py-3.5 focus:outline-none text-white text-sm sm:text-base placeholder-slate-600 resize-none"
               />
@@ -152,7 +169,7 @@ function Scanner({ user, token }) {
                 type="file" 
                 accept="image/*"
                 required 
-                onChange={e => setFile(e.target.files[0])}
+                onChange={e => { setFile(e.target.files[0]); setErrorMsg(null); }}
                 className="w-full glass-input px-4 py-3 file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-red-500/10 file:text-red-400 hover:file:bg-red-500/20 file:transition-all text-slate-500 text-sm sm:text-base"
               />
             </div>
@@ -169,7 +186,24 @@ function Scanner({ user, token }) {
   );
 }
 
-function ThreatLevelBar({ result }) {
+function ThreatLevelBar({ result, errorMsg }) {
+  if (errorMsg) {
+    return (
+      <div className="w-full bg-[#1a0000]/25 border border-red-500/25 backdrop-blur-md rounded-2xl px-5 py-3.5 flex items-center justify-between transition-all duration-500 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.05)]">
+        <span className="text-[9px] font-extrabold tracking-widest uppercase text-red-400/80 select-none">System Status</span>
+        <div className="flex-1 mx-4 sm:mx-8 h-2 rounded-full overflow-hidden bg-red-500/10 border border-red-500/15">
+          <div 
+            className="h-full transition-all duration-500 bg-gradient-to-r from-red-600 to-rose-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.5)]"
+            style={{ width: '100%' }}
+          ></div>
+        </div>
+        <span className="font-mono font-extrabold text-[10px] sm:text-xs tracking-wider animate-pulse flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span> TARGET UNREACHABLE
+        </span>
+      </div>
+    );
+  }
+
   if (!result) {
     return (
       <div className="w-full bg-[#001c10]/20 border border-[#10b981]/25 backdrop-blur-md rounded-2xl px-5 py-3.5 flex items-center justify-between transition-all duration-500 text-[#10b981] shadow-[0_0_15px_rgba(16,185,129,0.05)]">
@@ -243,7 +277,7 @@ function TabButton({ active, onClick, icon, text, desktopText }) {
   );
 }
 
-function MobileScannerTabBar({ activeTab, setActiveTab, setResult }) {
+function MobileScannerTabBar({ activeTab, setActiveTab, setResult, setErrorMsg }) {
   const containerRef = useRef(null);
   const tabs = ['url', 'email', 'qr'];
   const activeIndex = tabs.indexOf(activeTab);
@@ -304,6 +338,7 @@ function MobileScannerTabBar({ activeTab, setActiveTab, setResult }) {
     if (nextTab !== activeTab) {
       setActiveTab(nextTab);
       setResult(null);
+      if (setErrorMsg) setErrorMsg(null);
     }
   };
 
@@ -312,6 +347,7 @@ function MobileScannerTabBar({ activeTab, setActiveTab, setResult }) {
     if (nextTab !== activeTab) {
       setActiveTab(nextTab);
       setResult(null);
+      if (setErrorMsg) setErrorMsg(null);
     }
   };
 
